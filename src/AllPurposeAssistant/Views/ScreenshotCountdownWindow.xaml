@@ -1,0 +1,15 @@
+<Window x:Class="AllPurposeAssistant.Views.ScreenshotCountdownWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ResizeMode="NoResize"
+        Width="190" Height="132" WindowStartupLocation="Manual"
+        KeyDown="Window_KeyDown">
+    <Border Background="#E62C3E50" CornerRadius="12" Padding="14">
+        <StackPanel>
+            <TextBlock x:Name="CountdownText" Foreground="White" FontSize="26" FontWeight="Bold"
+                       HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+            <Button Content="取消 (Esc)" Height="28" Margin="0,8,0,0" Click="Cancel_Click"/>
+        </StackPanel>
+    </Border>
+</Window>

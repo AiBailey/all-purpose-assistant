@@ -1,0 +1,120 @@
+<UserControl x:Class="AllPurposeAssistant.Views.CalendarControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="DayButton" TargetType="Button">
+            <Setter Property="MinWidth" Value="34"/>
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="Margin" Value="1"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="#FDFDFE" CornerRadius="12" BorderBrush="#E0E4E8" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.06"/>
+        </Border.Effect>
+        <Grid Margin="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="34"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Button x:Name="PrevMonth" Content="&#8249;" Width="28" Height="28"
+                        FontSize="16" FontWeight="Bold" Foreground="#7F8C8D"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        HorizontalAlignment="Left" VerticalAlignment="Center"
+                        Click="PrevMonth_Click"/>
+                <TextBlock x:Name="MonthYearLabel" Text="2026年8月"
+                           FontSize="14" FontWeight="Bold" FontFamily="Microsoft YaHei"
+                           Foreground="#2C3E50"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button x:Name="NextMonth" Content="&#8250;" Width="28" Height="28"
+                        FontSize="16" FontWeight="Bold" Foreground="#7F8C8D"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Click="NextMonth_Click"/>
+            </Grid>
+
+            <UniformGrid Grid.Row="1" Rows="1" Columns="7" Margin="2,6,2,0">
+                <TextBlock Text="&#19968;" Foreground="#7F8C8D" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+                <TextBlock Text="&#20108;" Foreground="#7F8C8D" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+                <TextBlock Text="&#19977;" Foreground="#7F8C8D" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+                <TextBlock Text="&#22235;" Foreground="#7F8C8D" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+                <TextBlock Text="&#20116;" Foreground="#7F8C8D" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei"/>
+                <TextBlock Text="&#20845;" Foreground="#E74C3C" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Bold"/>
+                <TextBlock Text="&#26085;" Foreground="#E74C3C" FontSize="11"
+                           HorizontalAlignment="Center" FontFamily="Microsoft YaHei" FontWeight="Bold"/>
+            </UniformGrid>
+
+            <UniformGrid Grid.Row="2" Rows="6" Columns="7" Margin="0,4,0,0" x:Name="DaysGrid">
+                <Button x:Name="D01" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D02" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D03" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D04" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D05" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D06" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D07" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D08" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D09" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D10" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D11" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D12" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D13" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D14" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D15" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D16" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D17" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D18" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D19" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D20" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D21" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D22" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D23" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D24" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D25" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D26" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D27" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D28" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D29" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D30" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D31" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D32" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D33" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D34" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D35" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D36" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D37" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D38" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D39" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D40" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D41" Style="{StaticResource DayButton}" Click="Day_Click"/>
+                <Button x:Name="D42" Style="{StaticResource DayButton}" Click="Day_Click"/>
+            </UniformGrid>
+        </Grid>
+    </Border>
+</UserControl>
