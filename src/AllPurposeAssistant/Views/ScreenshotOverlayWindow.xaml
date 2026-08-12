@@ -8,7 +8,88 @@
         ShowInTaskbar="False"
         ResizeMode="NoResize"
         WindowStartupLocation="Manual"
-        KeyDown="Window_KeyDown">
+        PreviewKeyDown="Window_KeyDown">
+    <Window.Resources>
+        <Style x:Key="ToolButton" TargetType="ToggleButton">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#F0F3F7"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#DCEBF7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ColorButton" TargetType="ToggleButton">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent" BorderThickness="2" CornerRadius="10"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#7F8C8D"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#2C3E50"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ActionButton" TargetType="Button">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="FontSize" Value="17"/>
+            <Setter Property="FontFamily" Value="Microsoft YaHei"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#F0F3F7"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#DCEBF7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Canvas x:Name="RootCanvas">
             <!-- 四块蒙层：上、下、左、右，围住选区 -->
@@ -19,6 +100,15 @@
             <!-- 选区边框 -->
             <Rectangle x:Name="SelectionRect" Stroke="#4A90D9" StrokeThickness="2"
                        Fill="#204A90D9" Visibility="Collapsed"/>
+            <!-- 已截图的选区与同尺寸标注层。标注层的逻辑坐标始终是原图像素。 -->
+            <Canvas x:Name="SelectionHost" Visibility="Collapsed" ClipToBounds="True">
+                <Image x:Name="SelectedImage" Stretch="Fill"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <Canvas x:Name="AnnotateCanvas" Background="Transparent" Focusable="True"
+                        MouseDown="AnnotateCanvas_MouseDown"
+                        MouseMove="AnnotateCanvas_MouseMove"
+                        MouseUp="AnnotateCanvas_MouseUp"/>
+            </Canvas>
             <!-- 提示文字 -->
             <TextBlock x:Name="HintText" Text="拖动选择截图区域，Esc 取消"
                        Foreground="White" FontSize="14" FontFamily="Microsoft YaHei"
@@ -33,6 +123,50 @@
                     <TextBlock x:Name="SelectionInfoText" Margin="0,5,0,0"
                                Foreground="#2C3E50" FontSize="11" FontFamily="Consolas"
                                HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+            <!-- 工具条在框选完成后显示；位置由代码按选区下沿/上沿计算。 -->
+            <Border x:Name="InlineToolbar" Visibility="Collapsed" Background="#F7F9FBEE"
+                    BorderBrush="#DCE3EA" BorderThickness="1" CornerRadius="10" Padding="7,5">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="14" ShadowDepth="3" Opacity="0.24"/>
+                </Border.Effect>
+                <StackPanel Orientation="Horizontal">
+                    <ToggleButton x:Name="BtnPen" Style="{StaticResource ToolButton}" Content="&#x270F;"
+                                  ToolTip="画笔" IsChecked="True" Click="Tool_Click" Tag="pen"/>
+                    <ToggleButton x:Name="BtnRect" Style="{StaticResource ToolButton}" Content="&#9647;"
+                                  ToolTip="方框" Click="Tool_Click" Tag="rect"/>
+                    <ToggleButton x:Name="BtnArrow" Style="{StaticResource ToolButton}" Content="&#8599;"
+                                  ToolTip="箭头" Click="Tool_Click" Tag="arrow"/>
+                    <ToggleButton x:Name="BtnText" Style="{StaticResource ToolButton}" Content="T"
+                                  ToolTip="文字" FontWeight="Bold" Click="Tool_Click" Tag="text"/>
+                    <ToggleButton x:Name="BtnMosaic" Style="{StaticResource ToolButton}" Content="&#9638;"
+                                  ToolTip="马赛克" Click="Tool_Click" Tag="mosaic"/>
+                    <Separator Width="15" Margin="4,0"/>
+                    <ToggleButton x:Name="ColorRed" Style="{StaticResource ColorButton}" Background="#E74C3C"
+                                  ToolTip="红色" IsChecked="True" Click="Color_Click" Tag="#E74C3C"/>
+                    <ToggleButton x:Name="ColorBlue" Style="{StaticResource ColorButton}" Background="#4A90D9"
+                                  ToolTip="蓝色" Click="Color_Click" Tag="#4A90D9"/>
+                    <ToggleButton x:Name="ColorOrange" Style="{StaticResource ColorButton}" Background="#F39C12"
+                                  ToolTip="橙色" Click="Color_Click" Tag="#F39C12"/>
+                    <ToggleButton x:Name="ColorGreen" Style="{StaticResource ColorButton}" Background="#27AE60"
+                                  ToolTip="绿色" Click="Color_Click" Tag="#27AE60"/>
+                    <ToggleButton x:Name="ColorBlack" Style="{StaticResource ColorButton}" Background="#2C3E50"
+                                  ToolTip="黑色" Click="Color_Click" Tag="#2C3E50"/>
+                    <Separator Width="15" Margin="4,0"/>
+                    <Button Style="{StaticResource ActionButton}" Content="&#x21B6;" ToolTip="撤销 (Ctrl+Z)"
+                            Click="Undo_Click" Foreground="#7F8C8D"/>
+                    <Button Style="{StaticResource ActionButton}" Content="&#x21B7;" ToolTip="重做 (Ctrl+Y)"
+                            Click="Redo_Click" Foreground="#7F8C8D"/>
+                    <Separator Width="15" Margin="4,0"/>
+                    <Button Style="{StaticResource ActionButton}" Content="&#128204;" ToolTip="钉在桌面"
+                            Click="Pin_Click" Foreground="#E67E22"/>
+                    <Button Style="{StaticResource ActionButton}" Content="&#128190;" ToolTip="保存为文件"
+                            Click="Save_Click" Foreground="#4A90D9"/>
+                    <Button Style="{StaticResource ActionButton}" Content="&#x2715;" ToolTip="取消 (Esc)"
+                            Click="Cancel_Click" Foreground="#C0392B"/>
+                    <Button Style="{StaticResource ActionButton}" Content="&#x2713;" ToolTip="复制到剪贴板"
+                            Click="Copy_Click" Foreground="#27AE60"/>
                 </StackPanel>
             </Border>
         </Canvas>

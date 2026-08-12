@@ -80,29 +80,14 @@ public class ScreenshotService
                 captureBounds,
                 fullScreen,
                 ScreenCapture.GetDpiScale(),
-                (x, y, w, h) => OnSelected(fullScreen, x, y, w, h),
                 OnCancel);
+            overlay.ConfigureInlineEditor(_defaultSaveDirectory, _defaultSaveFormat, _jpegQuality, _pinnedOpacity);
+            overlay.Closed += (_, _) => _capturing = false;
             overlay.Show(); // 非模态
         }
         catch
         {
             _capturing = false;
-        }
-    }
-
-    private void OnSelected(BitmapSource? fullScreen, int x, int y, int w, int h)
-    {
-        _capturing = false;
-        if (fullScreen == null) return;
-
-        var crop = ScreenCapture.Crop(fullScreen, x, y, w, h);
-
-        if (crop.PixelWidth > 0 && crop.PixelHeight > 0)
-        {
-            var editor = new ScreenshotEditorWindow(crop, _defaultSaveDirectory, _defaultSaveFormat,
-                _jpegQuality, _pinnedOpacity);
-            editor.Show();
-            editor.Activate();
         }
     }
 

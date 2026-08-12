@@ -494,3 +494,6 @@ src/AllPurposeAssistant/Resources/bg_tmp.png
 # Local project documents
 docs/HANDOFF.md
 docs/加密环境编译问题解决方案.md
+
+# Local Codex workspace data
+.zcode/

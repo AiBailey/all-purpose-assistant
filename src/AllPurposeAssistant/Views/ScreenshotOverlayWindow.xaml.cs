@@ -8,12 +8,10 @@ using AllPurposeAssistant.Helpers;
 namespace AllPurposeAssistant.Views;
 
 // 参数：选区相对虚拟屏幕左上角的物理像素坐标 (left, top, width, height)
-public delegate void ScreenshotSelectionCallback(int x, int y, int width, int height);
 public delegate void ScreenshotCancelCallback();
 
 public partial class ScreenshotOverlayWindow : Window
 {
-    private readonly ScreenshotSelectionCallback _onSelected;
     private readonly ScreenshotCancelCallback _onCancel;
     private readonly CaptureBounds _captureBounds;
     private readonly BitmapSource _screenImage;
@@ -21,12 +19,11 @@ public partial class ScreenshotOverlayWindow : Window
     private Point _startPhysical;
 
     public ScreenshotOverlayWindow(CaptureBounds captureBounds, BitmapSource screenImage, double dpiScale,
-        ScreenshotSelectionCallback onSelected, ScreenshotCancelCallback onCancel)
+        ScreenshotCancelCallback onCancel)
     {
         _captureBounds = captureBounds;
         _screenImage = screenImage;
         _dpiScale = dpiScale;
-        _onSelected = onSelected;
         _onCancel = onCancel;
         InitializeComponent();
         Loaded += OnLoaded;
@@ -65,6 +62,9 @@ public partial class ScreenshotOverlayWindow : Window
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         base.OnMouseLeftButtonDown(e);
+        if (_state == OverlayState.Editing)
+            return;
+
         _startPhysical = NativeMethods.GetCursorPos();
         SelectionRect.Visibility = Visibility.Visible;
         CaptureMouse();
@@ -73,7 +73,7 @@ public partial class ScreenshotOverlayWindow : Window
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
-        if (e.LeftButton != MouseButtonState.Pressed) return;
+        if (_state != OverlayState.Selecting || e.LeftButton != MouseButtonState.Pressed) return;
 
         var cur = NativeMethods.GetCursorPos();
         double x = System.Math.Min(_startPhysical.X, cur.X);
@@ -122,6 +122,8 @@ public partial class ScreenshotOverlayWindow : Window
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
     {
         base.OnMouseLeftButtonUp(e);
+        if (_state != OverlayState.Selecting) return;
+
         ReleaseMouseCapture();
         Magnifier.Visibility = Visibility.Collapsed;
 
@@ -139,28 +141,19 @@ public partial class ScreenshotOverlayWindow : Window
             return;
         }
 
-        _onSelected?.Invoke((int)(x - _captureBounds.Left), (int)(y - _captureBounds.Top),
+        BeginInlineEditing((int)(x - _captureBounds.Left), (int)(y - _captureBounds.Top),
             (int)w, (int)h);
-        Close();
     }
 
     private Point ToOverlayDip(double physicalX, double physicalY) => new(
         (physicalX - _captureBounds.Left) / _dpiScale,
         (physicalY - _captureBounds.Top) / _dpiScale);
 
-    protected override void OnDeactivated(EventArgs e)
-    {
-        base.OnDeactivated(e);
-        // 失去焦点（点了别处）取消
-        if (IsVisible)
-        {
-            _onCancel?.Invoke();
-            Close();
-        }
-    }
-
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        if (TryHandleInlineKey(e))
+            return;
+
         if (e.Key == Key.Escape)
         {
             _onCancel?.Invoke();
