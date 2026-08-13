@@ -39,10 +39,18 @@
             </Ellipse.Fill>
         </Ellipse>
         <Ellipse x:Name="BallArtwork" Width="52" Height="52" Opacity="0.12" IsHitTestVisible="False"/>
-        <TextBlock Text="帮" Foreground="White" FontSize="19" FontWeight="Bold"
+        <TextBlock x:Name="BallLabel" Text="帮" Foreground="White" FontSize="19" FontWeight="Bold"
                    FontFamily="Microsoft YaHei"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsHitTestVisible="False"/>
+        <StackPanel x:Name="MetricsOverlay" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    IsHitTestVisible="False">
+            <TextBlock x:Name="CpuText" Foreground="White" FontSize="10" FontWeight="Bold"
+                       FontFamily="Microsoft YaHei" HorizontalAlignment="Center" Text="CPU 0%"/>
+            <TextBlock x:Name="MemText" Foreground="White" FontSize="10" FontWeight="Bold"
+                       FontFamily="Microsoft YaHei" HorizontalAlignment="Center" Text="内存 0%"/>
+        </StackPanel>
 
         <Popup x:Name="ActionPanel" PlacementTarget="{Binding ElementName=BallEllipse}"
                Placement="Right" AllowsTransparency="True"

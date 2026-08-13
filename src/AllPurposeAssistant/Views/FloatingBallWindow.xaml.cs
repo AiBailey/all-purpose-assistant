@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using AllPurposeAssistant.Helpers;
 using AllPurposeAssistant.Models;
 using AllPurposeAssistant.Services;
@@ -19,6 +20,8 @@ public partial class FloatingBallWindow : Window
     private Point _dragStart;
     private bool _isDragging;
 
+    private readonly DispatcherTimer _metricsRefresh = new() { Interval = TimeSpan.FromSeconds(1) };
+
     public FloatingBallWindow(WindowManager windowManager, NoteService noteService,
         QuickActionsService quickActionsService)
     {
@@ -26,6 +29,8 @@ public partial class FloatingBallWindow : Window
         _noteService = noteService;
         _quickActionsService = quickActionsService;
         InitializeComponent();
+
+        _metricsRefresh.Tick += (_, _) => UpdateMetrics();
 
         RefreshQuickActions();
         _quickActionsService.Changed += OnQuickActionsChanged;
@@ -35,6 +40,15 @@ public partial class FloatingBallWindow : Window
             var helper = new System.Windows.Interop.WindowInteropHelper(this);
             NativeMethods.SetToolWindow(helper.Handle);
             LoadArtwork();
+            // 建立 CPU 采样基线，让首次悬停即显示有参考意义的占用率。
+            SystemMetrics.GetCpuUsagePercent();
+        };
+
+        // 窗口被 Hide（如最小化到托盘）时不一定触发 MouseLeave，这里兜底清理状态。
+        IsVisibleChanged += (_, e) =>
+        {
+            if (!IsVisible)
+                ResetBall();
         };
 
         Closing += (_, e) =>
@@ -92,12 +106,30 @@ public partial class FloatingBallWindow : Window
     {
         BallEllipse.Width = 60;
         BallEllipse.Height = 60;
+        BallLabel.Visibility = Visibility.Collapsed;
+        MetricsOverlay.Visibility = Visibility.Visible;
+        UpdateMetrics();
+        _metricsRefresh.Start();
     }
 
     private void Window_MouseLeave(object sender, MouseEventArgs e)
     {
+        ResetBall();
+    }
+
+    private void ResetBall()
+    {
         BallEllipse.Width = 56;
         BallEllipse.Height = 56;
+        BallLabel.Visibility = Visibility.Visible;
+        MetricsOverlay.Visibility = Visibility.Collapsed;
+        _metricsRefresh.Stop();
+    }
+
+    private void UpdateMetrics()
+    {
+        CpuText.Text = $"CPU {SystemMetrics.GetCpuUsagePercent():0}%";
+        MemText.Text = $"内存 {SystemMetrics.GetMemoryUsagePercent():0}%";
     }
 
     private void QuickAction_Click(object sender, RoutedEventArgs e)
