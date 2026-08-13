@@ -496,3 +496,6 @@ docs/
 
 # Local Codex workspace data
 .zcode/
+
+# Local DGS encryption restore script (machine-specific, not for the repo)
+_restore_plaintext.sh
